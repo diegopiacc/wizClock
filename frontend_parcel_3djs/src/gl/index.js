@@ -2,10 +2,11 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import vertexShader from "./glsl/vertex.glsl";
 import fragmentShader from "./glsl/fragment.glsl";
+import spaceShader from "./glsl/space.glsl";
 
-import clockLbl12 from "../assets/test_pennant.png";
-import clockLbl3 from "../assets/test_pennant.png";
-import clockLbl6 from "../assets/test_pennant.png";
+import clockLbl12 from "../assets/wizClock_casa.png";
+import clockLbl3 from "../assets/wizClock_maneggio.png";
+import clockLbl6 from "../assets/wizClock_spesa.png";
 
 class Gl {
   constructor() {
@@ -18,13 +19,13 @@ class Gl {
       100
     );
 
-    this.camera.position.z = 1;
+    this.camera.position.z = 4;
     this.renderer = new THREE.WebGLRenderer({
       canvas: document.querySelector("#app"),
       antialias: true
     });
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.renderer.setClearColor(0xffffff, 1);
+    this.renderer.setClearColor(0x0, 1);
 
     this.clock = new THREE.Clock();
 
@@ -39,9 +40,25 @@ class Gl {
   }
 
   createMesh() {
-    this.geometry = new THREE.PlaneGeometry(0.6, 0.2, 24, 8);
+    this.geometry = new THREE.PlaneGeometry(0.6, 0.22, 24, 8);
+    this.geometrySlonger = new THREE.PlaneGeometry(0.7, 0.22, 24, 8);
+    this.bg_geom = new THREE.PlaneGeometry(20,20, 1, 1);
 
     // geometry is reusable, material no
+
+    /* bg 1 */
+    this.materialbg1 = new THREE.ShaderMaterial({
+      fragmentShader: spaceShader,
+      uniforms: {
+        uTime: { value: 0.0 }
+      },
+      wireframe: false,
+      transparent: true,
+      side: THREE.DoubleSide
+    });
+    this.meshbg1 = new THREE.Mesh(this.bg_geom, this.materialbg1);
+    this.scene.add(this.meshbg1);
+    this.meshbg1.position.set(0, 0, -20);
 
     /*   */
     this.material12 = new THREE.ShaderMaterial({
@@ -72,7 +89,7 @@ class Gl {
       transparent: true,
       side: THREE.DoubleSide
     });
-    this.mesh3oclock = new THREE.Mesh(this.geometry, this.material3);
+    this.mesh3oclock = new THREE.Mesh(this.geometrySlonger, this.material3);
     this.scene.add(this.mesh3oclock);
     this.mesh3oclock.position.set(1, 0, 0);
 

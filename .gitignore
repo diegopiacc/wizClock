@@ -2,3 +2,7 @@
 frontend_parcel_3djs/.cache/
 
 frontend_parcel_3djs/node_modules/
+
+frontend_parcel_3djs/.parcel-cache/
+
+frontend_parcel_3djs/dist/

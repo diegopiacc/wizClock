@@ -10,6 +10,7 @@
   "dependencies": {
     "jquery": "^3.6.0",
     "parcel": "^2.0.1",
+    "parcel-plugin-uglify": "^1.0.0",
     "three": "^0.114.0"
   },
   "devDependencies": {

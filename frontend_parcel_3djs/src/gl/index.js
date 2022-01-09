@@ -2,7 +2,12 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import vertexShader from "./glsl/vertex.glsl";
 import fragmentShader from "./glsl/fragment.glsl";
-import spaceShader from "./glsl/space.glsl";
+
+// background - simple shader for debug
+import spaceShader from "./glsl/space1.glsl";
+
+// "heavy" shader for production
+// import spaceShader from "./glsl/space_heavy.glsl";
 
 import clockLbl12 from "../assets/wizClock_casa.png";
 import clockLbl3 from "../assets/wizClock_maneggio.png";
@@ -50,7 +55,7 @@ class Gl {
     this.materialbg1 = new THREE.ShaderMaterial({
       fragmentShader: spaceShader,
       uniforms: {
-        uTime: { value: 0.0 }
+        uTime: { value: 0.0 },
       },
       wireframe: false,
       transparent: true,
@@ -59,6 +64,7 @@ class Gl {
     this.meshbg1 = new THREE.Mesh(this.bg_geom, this.materialbg1);
     this.scene.add(this.meshbg1);
     this.meshbg1.position.set(0, 0, -20);
+
 
     /*   */
     this.material12 = new THREE.ShaderMaterial({
@@ -127,9 +133,12 @@ class Gl {
   }
 
   render() {
-    this.material12.uniforms.uTime.value = this.clock.getElapsedTime();
-    this.material3.uniforms.uTime.value = this.clock.getElapsedTime();
-    this.material6.uniforms.uTime.value = this.clock.getElapsedTime();
+    let time = this.clock.getElapsedTime();
+    // console.log('wiiii ', time)
+    this.materialbg1.uniforms.uTime.value = time;
+    this.material12.uniforms.uTime.value = time;
+    this.material3.uniforms.uTime.value = time;
+    this.material6.uniforms.uTime.value = time;
     this.renderer.render(this.scene, this.camera);
   }
 

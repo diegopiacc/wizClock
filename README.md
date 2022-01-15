@@ -25,6 +25,9 @@ Hopefully someday you'll have time and will to do it
 TODO
 =================
 
+To load stuff https://github.com/elwin013/parcel-reporter-static-files-copy, https://forum.babylonjs.com/t/how-to-load-a-obj-babylon-gltf-file-while-using-parcel-bundler/3427
+
+
 Ok, of course this is not the right place for this. Anyway.
 
 Shaders to look for the background:

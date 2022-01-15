@@ -1,17 +1,26 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+
+// flags shaders
 import vertexShader from "./glsl/vertex.glsl";
 import fragmentShader from "./glsl/fragment.glsl";
 
+//cogwheel shaders
+import slowlyRotatingVertices from "./glsl/slowlyRotatingVertices.glsl";
+import textureFragmentShader from "./glsl/textureFragmentShader.glsl";
+
 // background - simple shader for debug
-import spaceShader from "./glsl/space1.glsl";
+// import spaceShader from "./glsl/space1.glsl";
 
 // "heavy" shader for production
-// import spaceShader from "./glsl/space_heavy.glsl";
+import spaceShader from "./glsl/space_heavy.glsl";
 
 import clockLbl12 from "../assets/wizClock_casa.png";
 import clockLbl3 from "../assets/wizClock_maneggio.png";
 import clockLbl6 from "../assets/wizClock_spesa.png";
+
+import bronze from "../assets/bronze.jpg";
 
 class Gl {
   constructor() {
@@ -44,6 +53,19 @@ class Gl {
     this.addEvents();
   }
 
+  createMetalShader() {
+    return new THREE.ShaderMaterial({
+      vertexShader: slowlyRotatingVertices,
+      fragmentShader: textureFragmentShader,
+      uniforms: {
+        uTime: { value: 0.0 },
+        speedFactor: { value: 0.2 },
+        uTexture: { value: new THREE.TextureLoader().load(bronze) }
+      },
+      wireframe: false
+    });
+  }
+
   createMesh() {
     this.geometry = new THREE.PlaneGeometry(0.6, 0.22, 24, 8);
     this.geometrySlonger = new THREE.PlaneGeometry(0.7, 0.22, 24, 8);
@@ -58,12 +80,53 @@ class Gl {
         uTime: { value: 0.0 },
       },
       wireframe: false,
-      transparent: true,
-      side: THREE.DoubleSide
+      transparent: true
     });
     this.meshbg1 = new THREE.Mesh(this.bg_geom, this.materialbg1);
     this.scene.add(this.meshbg1);
     this.meshbg1.position.set(0, 0, -20);
+
+
+    /* CogWheels  */
+    this.cog1Material = this.createMetalShader();
+    this.cog2Material = this.createMetalShader();
+
+	  var self = this;
+    var loader = new GLTFLoader();
+    loader.crossOrigin = true;
+    loader.load(
+      "./cogwheel_big_2.glb",
+      function(data) {
+      data.scene.traverse( function( object ) 
+        {            // console.log('wiiiiiiiiiiiiiiii2',object);
+          if ((object instanceof THREE.Mesh))
+          {
+            self.scene.add( object );
+            object.position.set(0, 0, -0.1);
+            object.material = self.cog1Material;
+          }
+      });
+    });
+
+    loader.load(
+      "./cogwheel_small_1.glb",
+      function(data) {
+      data.scene.traverse( function( object ) 
+        {            // console.log('wiiiiiiiiiiiiiiii2',object);
+          if ((object instanceof THREE.Mesh))
+          {
+            self.scene.add( object );
+            object.position.set(0.6, 0.6, -0.12);
+            object.scale.set(0.4, 0.4, 0.4);
+            object.material = self.cog2Material;
+          }
+      });
+    });
+
+
+    // this.cog1geometry = new THREE.BoxGeometry( 1, 1, 1 );
+    // this.cog1mesh = new THREE.Mesh( self.cog1geometry, this.cogMaterial );
+    // this.scene.add( this.cog1mesh );
 
 
     /*   */
@@ -75,8 +138,7 @@ class Gl {
         uTexture: { value: new THREE.TextureLoader().load(clockLbl12) }
       },
       wireframe: false,
-      transparent: true,
-      side: THREE.DoubleSide
+      transparent: true
     });
     this.mesh12oclock = new THREE.Mesh(this.geometry, this.material12);
     this.scene.add(this.mesh12oclock);
@@ -92,8 +154,7 @@ class Gl {
         uTexture: { value: new THREE.TextureLoader().load(clockLbl3) }
       },
       wireframe: false,
-      transparent: true,
-      side: THREE.DoubleSide
+      transparent: true
     });
     this.mesh3oclock = new THREE.Mesh(this.geometrySlonger, this.material3);
     this.scene.add(this.mesh3oclock);
@@ -110,8 +171,7 @@ class Gl {
         uTexture: { value: new THREE.TextureLoader().load(clockLbl6) }
       },
       wireframe: false,
-      transparent: true,
-      side: THREE.DoubleSide
+      transparent: true
     });
     this.mesh6oclock = new THREE.Mesh(this.geometry, this.material6);
     this.scene.add(this.mesh6oclock);
@@ -136,6 +196,10 @@ class Gl {
     let time = this.clock.getElapsedTime();
     // console.log('wiiii ', time)
     this.materialbg1.uniforms.uTime.value = time;
+    this.cog1Material.uniforms.uTime.value = time;
+    this.cog1Material.uniforms.speedFactor.value = 0.1;
+    this.cog2Material.uniforms.uTime.value = time;
+    this.cog2Material.uniforms.speedFactor.value = 0.4;
     this.material12.uniforms.uTime.value = time;
     this.material3.uniforms.uTime.value = time;
     this.material6.uniforms.uTime.value = time;

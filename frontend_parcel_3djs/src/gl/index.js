@@ -11,16 +11,26 @@ import slowlyRotatingVertices from "./glsl/slowlyRotatingVertices.glsl";
 import textureFragmentShader from "./glsl/textureFragmentShader.glsl";
 
 // background - simple shader for debug
-// import spaceShader from "./glsl/space1.glsl";
+import spaceShader from "./glsl/space1.glsl";
 
 // "heavy" shader for production
-import spaceShader from "./glsl/space_heavy.glsl";
+// import spaceShader from "./glsl/space_heavy.glsl";
 
-import clockLbl12 from "../assets/wizClock_casa.png";
+import clockLbl1 from "../assets/wizClock_casa.png";
+import clockLbl2 from "../assets/wizClock_nonni.png";
 import clockLbl3 from "../assets/wizClock_maneggio.png";
-import clockLbl6 from "../assets/wizClock_spesa.png";
+import clockLbl4 from "../assets/wizClock_lavoro.png";
+import clockLbl5 from "../assets/wizClock_scuola.png";
+import clockLbl6 from "../assets/wizClock_inviaggio.png";
+import clockLbl7 from "../assets/wizClock_chiesa.png";
+import clockLbl8 from "../assets/wizClock_scuola.png";
+import clockLbl9 from "../assets/wizClock_spesa.png";
+import clockLbl10 from "../assets/wizClock_montagna.png";
+import clockLbl11 from "../assets/wizClock_vialta.png";
+import clockLbl12 from "../assets/wizClock_none.png";
 
 import bronze from "../assets/bronze.jpg";
+import silver1 from "../assets/silver.jpg";
 
 class Gl {
   constructor() {
@@ -66,9 +76,24 @@ class Gl {
     });
   }
 
+
+  createSilverShader() {
+    return new THREE.ShaderMaterial({
+      vertexShader: slowlyRotatingVertices,
+      fragmentShader: textureFragmentShader,
+      uniforms: {
+        uTime: { value: 0.0 },
+        speedFactor: { value: 0.2 },
+        uTexture: { value: new THREE.TextureLoader().load(silver1) }
+      },
+      wireframe: false
+    });
+  }
+
   createMesh() {
-    this.geometry = new THREE.PlaneGeometry(0.6, 0.22, 24, 8);
-    this.geometrySlonger = new THREE.PlaneGeometry(0.7, 0.22, 24, 8);
+    this.pennantGeometry = new THREE.PlaneGeometry(0.6, 0.22, 24, 2);
+    this.pennantGeometryBig = new THREE.PlaneGeometry(0.6, 0.4, 24, 2);
+    this.geometrySlonger = new THREE.PlaneGeometry(0.7, 0.22, 24, 2);
     this.bg_geom = new THREE.PlaneGeometry(20,20, 1, 1);
 
     // geometry is reusable, material no
@@ -88,7 +113,8 @@ class Gl {
 
 
     /* CogWheels  */
-    this.cog1Material = this.createMetalShader();
+    this.cog1Material = this.createMetalShader();   
+    this.hand1Material = this.createSilverShader();
     this.cog2Material = this.createMetalShader();
 
 	  var self = this;
@@ -116,12 +142,45 @@ class Gl {
           if ((object instanceof THREE.Mesh))
           {
             self.scene.add( object );
-            object.position.set(0.6, 0.6, -0.12);
+            object.position.set(0.6, 0.6, -0.15);
             object.scale.set(0.4, 0.4, 0.4);
             object.material = self.cog2Material;
           }
       });
     });
+
+    /* hands and small portrait figurines */
+    for(let fi=1; fi<5; fi++) {
+
+      loader.load(
+        "./hand_00"+fi+".glb",
+        function(data) {
+        data.scene.traverse( function( object )
+        {
+        if ((object instanceof THREE.Mesh)) {
+          self.scene.add( object );
+          object.position.set(0, 0, 0.25);
+          object.scale.set(2, 2, 2);
+          object.material = self.hand1Material;
+          object.name = "hand_"+fi;
+        }
+        });
+      });
+
+
+      const geometry = new THREE.CircleGeometry( 0.07, 16 );
+      const material = new THREE.MeshBasicMaterial( { color: 0x003344 } );
+      const circle = new THREE.Mesh( geometry, material );
+      circle.name = "figurine_"+fi;
+      this.scene.add( circle );
+    }
+
+
+
+
+
+
+
 
 
     // this.cog1geometry = new THREE.BoxGeometry( 1, 1, 1 );
@@ -131,37 +190,89 @@ class Gl {
 
     /*   */
     this.material12 = new THREE.ShaderMaterial({
-      vertexShader,
-      fragmentShader,
+      vertexShader, fragmentShader,
       uniforms: {
         uTime: { value: 0.0 },
         uTexture: { value: new THREE.TextureLoader().load(clockLbl12) }
       },
-      wireframe: false,
       transparent: true
     });
-    this.mesh12oclock = new THREE.Mesh(this.geometry, this.material12);
+    this.mesh12oclock = new THREE.Mesh(this.pennantGeometryBig, this.material12);
     this.scene.add(this.mesh12oclock);
-    this.mesh12oclock.position.set(0, 1, 0);
+    this.mesh12oclock.position.set(0, 1, 0.1);
+	
+	/*   */
+
+    this.material1 = new THREE.ShaderMaterial({
+      vertexShader, fragmentShader,
+      uniforms: {
+        uTime: { value: 0.0 },
+        uTexture: { value: new THREE.TextureLoader().load(clockLbl1) }
+      },
+      transparent: true
+    });
+    this.mesh1oclock = new THREE.Mesh(this.pennantGeometry, this.material1);
+    this.scene.add(this.mesh1oclock);
+    this.mesh1oclock.position.set(0.5, 0.8660254, 0);
 
     /*   */
 
+    this.material2 = new THREE.ShaderMaterial({
+      vertexShader, fragmentShader,
+      uniforms: {
+        uTime: { value: 0.0 },
+        uTexture: { value: new THREE.TextureLoader().load(clockLbl2) }
+      },
+      transparent: true
+    });
+    this.mesh2oclock = new THREE.Mesh(this.geometrySlonger, this.material2);
+    this.scene.add(this.mesh2oclock);
+    this.mesh2oclock.position.set(0.8660254, 0.5, 0);
+
+	/*   */
+
     this.material3 = new THREE.ShaderMaterial({
-      vertexShader,
-      fragmentShader,
+      vertexShader, fragmentShader,
       uniforms: {
         uTime: { value: 0.0 },
         uTexture: { value: new THREE.TextureLoader().load(clockLbl3) }
       },
-      wireframe: false,
       transparent: true
     });
     this.mesh3oclock = new THREE.Mesh(this.geometrySlonger, this.material3);
     this.scene.add(this.mesh3oclock);
     this.mesh3oclock.position.set(1, 0, 0);
+		
+	/*   */
+
+    this.material4 = new THREE.ShaderMaterial({
+      vertexShader, fragmentShader,
+      uniforms: {
+        uTime: { value: 0.0 },
+        uTexture: { value: new THREE.TextureLoader().load(clockLbl4) }
+      },
+      transparent: true
+    });
+    this.mesh4oclock = new THREE.Mesh(this.geometrySlonger, this.material4);
+    this.scene.add(this.mesh4oclock);
+    this.mesh4oclock.position.set(0.8660254, -0.5, 0);
 
 
     /*   */
+	
+	this.material5 = new THREE.ShaderMaterial({
+      vertexShader, fragmentShader,
+      uniforms: {
+        uTime: { value: 0.0 },
+        uTexture: { value: new THREE.TextureLoader().load(clockLbl5) }
+      },
+      transparent: true
+    });
+    this.mesh5oclock = new THREE.Mesh(this.geometrySlonger, this.material5);
+    this.scene.add(this.mesh5oclock);
+    this.mesh5oclock.position.set(0.5, -0.8660254, 0);
+		
+	/*   */
 
     this.material6 = new THREE.ShaderMaterial({
       vertexShader,
@@ -173,12 +284,81 @@ class Gl {
       wireframe: false,
       transparent: true
     });
-    this.mesh6oclock = new THREE.Mesh(this.geometry, this.material6);
+    this.mesh6oclock = new THREE.Mesh(this.geometrySlonger, this.material6);
     this.scene.add(this.mesh6oclock);
-    this.mesh6oclock.position.set(0, -1, 0);
+    this.mesh6oclock.position.set(0, -1, 0.1);
 
+    /*   */
+	
+    this.material7 = new THREE.ShaderMaterial({
+      vertexShader, fragmentShader,
+      uniforms: {
+        uTime: { value: 0.0 },
+        uTexture: { value: new THREE.TextureLoader().load(clockLbl7) }
+      },
+      transparent: true
+    });
+    this.mesh7oclock = new THREE.Mesh(this.pennantGeometry, this.material7);
+    this.scene.add(this.mesh7oclock);
+    this.mesh7oclock.position.set(-0.5, -0.8660254, 0);
 
+    /*   */
+	
+    this.material8 = new THREE.ShaderMaterial({
+      vertexShader, fragmentShader,
+      uniforms: {
+        uTime: { value: 0.0 },
+        uTexture: { value: new THREE.TextureLoader().load(clockLbl8) }
+      },
+      transparent: true
+    });
+    this.mesh8oclock = new THREE.Mesh(this.geometrySlonger, this.material8);
+    this.scene.add(this.mesh8oclock);
+    this.mesh8oclock.position.set(-0.8660254, -0.5, 0);
 
+    /*   */
+
+    this.material9 = new THREE.ShaderMaterial({
+      vertexShader, fragmentShader,
+      uniforms: {
+        uTime: { value: 0.0 },
+        uTexture: { value: new THREE.TextureLoader().load(clockLbl9) }
+      },
+      transparent: true
+    });
+    this.mesh9oclock = new THREE.Mesh(this.geometrySlonger, this.material9);
+    this.scene.add(this.mesh9oclock);
+    this.mesh9oclock.position.set(-1, 0, 0);
+
+    /*   */
+
+    this.material10 = new THREE.ShaderMaterial({
+      vertexShader, fragmentShader,
+      uniforms: {
+        uTime: { value: 0.0 },
+        uTexture: { value: new THREE.TextureLoader().load(clockLbl10) }
+      },
+      transparent: true
+    });
+    this.mesh10oclock = new THREE.Mesh(this.geometrySlonger, this.material10);
+    this.scene.add(this.mesh10oclock);
+    this.mesh10oclock.position.set(-0.8660254, 0.5, 0);
+
+    /*   */
+	
+    this.material11 = new THREE.ShaderMaterial({
+      vertexShader, fragmentShader,
+      uniforms: {
+        uTime: { value: 0.0 },
+        uTexture: { value: new THREE.TextureLoader().load(clockLbl11) }
+      },
+      transparent: true
+    });
+    this.mesh11oclock = new THREE.Mesh(this.pennantGeometry, this.material11);
+    this.scene.add(this.mesh11oclock);
+    this.mesh11oclock.position.set(-0.5, 0.8660254, 0);
+
+    /*   */
 
   }
 
@@ -193,17 +373,60 @@ class Gl {
   }
 
   render() {
+
+    // update times
     let time = this.clock.getElapsedTime();
-    // console.log('wiiii ', time)
     this.materialbg1.uniforms.uTime.value = time;
     this.cog1Material.uniforms.uTime.value = time;
     this.cog1Material.uniforms.speedFactor.value = 0.1;
     this.cog2Material.uniforms.uTime.value = time;
     this.cog2Material.uniforms.speedFactor.value = 0.4;
     this.material12.uniforms.uTime.value = time;
+    this.material1.uniforms.uTime.value = time;
+    this.material2.uniforms.uTime.value = time;
     this.material3.uniforms.uTime.value = time;
+    this.material4.uniforms.uTime.value = time;
+    this.material5.uniforms.uTime.value = time;
     this.material6.uniforms.uTime.value = time;
+    this.material7.uniforms.uTime.value = time;
+    this.material8.uniforms.uTime.value = time;
+    this.material9.uniforms.uTime.value = time;
+    this.material10.uniforms.uTime.value = time;
+    this.material11.uniforms.uTime.value = time;
     this.renderer.render(this.scene, this.camera);
+
+    // update hands
+
+
+
+  }
+
+  setHandHour(hand, hour) {
+    console.log("setHandHour ", hand, hour);
+    let halfPi = 0.5 * Math.PI;
+    let rot = Math.PI * hour / 6.0;
+    let obj = this.scene.getObjectByName("hand_"+hand);
+    if(obj) {
+      // obj.rotation.set(0, 0, -rot);
+      const q1 = new THREE.Quaternion();
+      q1.setFromAxisAngle( new THREE.Vector3( 1, 0, 0 ), halfPi );
+      const q2 = new THREE.Quaternion();
+      q2.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), -rot );
+      q1.multiply(q2);
+      obj.rotation.setFromQuaternion(q1);
+    } else {
+      console.log(" [ Hand rotation set error ] - cannot find obj hand_"+hand);
+    }
+    //
+    // figurine
+    let fobj = this.scene.getObjectByName("figurine_"+hand);
+    let figurineDistance = 0.72 - 0.1 * hand;
+    let figurineDistanceZ = 0.09 + 0.053 * hand;
+    if(fobj) {
+      fobj.position.set(figurineDistance * Math.sin(rot), figurineDistance * Math.cos(rot), figurineDistanceZ);
+    } else {
+      console.log(" [ Figurine set error ] - cannot find obj figurine_"+hand);
+    }
   }
 
   onResize() {

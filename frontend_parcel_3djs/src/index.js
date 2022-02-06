@@ -9,34 +9,35 @@ var jquery = require("jquery");
 window.$ = window.jQuery = jquery
 
 $(function() {
-  console.log('ERODE 1 ', WIZDATA_URL);
+  console.log(' [ Debug API] url: ', WIZDATA_URL);
 
   let places = [
     {
       lat: 44.690368658383264,
       lon: 11.782798106212221,
       radius: 1,
-      label: "Casa"
+      label: "Casa",
+      hour: 1
     },
     {
       lat: 44.690368658383264,
       lon: 11.782798106212221,
       radius: 1,
-      label: "Casa"
+      label: "Nonni",
+      hour: 2
     }
   ];
 
   let coordinatesToHour = function(lat, lon) {
-    //
-    places.forEach(place => {
+    for(let i=0; i<places.length; i++) {
+      const place = places[i];
       let dst = Math.sqrt((lat-place.lat)*(lat-place.lat) + (lon-place.lon)*(lon-place.lon));
       if(dst < place.radius) {
-        return place;
+        return place.hour;
       }
-    });
-
-
-
+    };
+    // nothing found?
+    return 12;
   }
 
 
@@ -62,15 +63,12 @@ $(function() {
       console.error('Error - no Items on data returned - data:', data)
       return;
     }
-    data.Items.forEach(el => {
+
+    data.Items.forEach((el, idx) => {
       let hr = coordinatesToHour(el.lastLat, el.lastLon);
-      console.log('ERODE 2X', el, hr );
+      console.log(' [ Debug position ] ', el, hr );
+      scene.setHandHour(idx+1, hr)
     });
-
-    
- 
-
-
 
   });
 });

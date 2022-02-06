@@ -40,3 +40,8 @@ Tutorial on the principles of painting with math:
 https://www.shadertoy.com/view/lty3Rt
 
 https://www.shadertoy.com/view/lty3Rt
+
+To send data to the backend, I am going to try this:
+
+https://f-droid.org/en/packages/com.mendhak.gpslogger/
+

@@ -10,11 +10,11 @@ import fragmentShader from "./glsl/fragment.glsl";
 import slowlyRotatingVertices from "./glsl/slowlyRotatingVertices.glsl";
 import textureFragmentShader from "./glsl/textureFragmentShader.glsl";
 
-// background - simple shader for debug
-import spaceShader from "./glsl/space1.glsl";
+//// background - simple shader for debug
+//import spaceShader from "./glsl/space1.glsl";
 
 // "heavy" shader for production
-// import spaceShader from "./glsl/space_heavy.glsl";
+import spaceShader from "./glsl/space_heavy.glsl";
 
 import clockLbl1 from "../assets/wizClock_casa.png";
 import clockLbl2 from "../assets/wizClock_nonni.png";
@@ -23,7 +23,7 @@ import clockLbl4 from "../assets/wizClock_lavoro.png";
 import clockLbl5 from "../assets/wizClock_scuola.png";
 import clockLbl6 from "../assets/wizClock_inviaggio.png";
 import clockLbl7 from "../assets/wizClock_chiesa.png";
-import clockLbl8 from "../assets/wizClock_scuola.png";
+import clockLbl8 from "../assets/wizClock_stalla.png";
 import clockLbl9 from "../assets/wizClock_spesa.png";
 import clockLbl10 from "../assets/wizClock_montagna.png";
 import clockLbl11 from "../assets/wizClock_vialta.png";
@@ -31,6 +31,11 @@ import clockLbl12 from "../assets/wizClock_none.png";
 
 import bronze from "../assets/bronze.jpg";
 import silver1 from "../assets/silver.jpg";
+
+import portrait_1 from "../assets/wizClock_portrait_1.png"
+import portrait_2 from "../assets/wizClock_portrait_2.png"
+import portrait_3 from "../assets/wizClock_portrait_3.png"
+import portrait_4 from "../assets/wizClock_portrait_4.png"
 
 class Gl {
   constructor() {
@@ -150,7 +155,17 @@ class Gl {
     });
 
     /* hands and small portrait figurines */
-    for(let fi=1; fi<5; fi++) {
+    
+
+
+let textureMaps = [];
+textureMaps[0] = null;
+textureMaps[1] = new THREE.TextureLoader().load(portrait_1);
+textureMaps[2] = new THREE.TextureLoader().load(portrait_2);
+textureMaps[3] = new THREE.TextureLoader().load(portrait_3);
+textureMaps[4] = new THREE.TextureLoader().load(portrait_4);
+
+for(let fi=1; fi<5; fi++) {
 
       loader.load(
         "./hand_00"+fi+".glb",
@@ -163,13 +178,14 @@ class Gl {
           object.scale.set(2, 2, 2);
           object.material = self.hand1Material;
           object.name = "hand_"+fi;
+console.log("adding " +  object.name);
         }
         });
       });
 
 
       const geometry = new THREE.CircleGeometry( 0.07, 16 );
-      const material = new THREE.MeshBasicMaterial( { color: 0x003344 } );
+      const material = new THREE.MeshBasicMaterial( { map: textureMaps[fi] } );
       const circle = new THREE.Mesh( geometry, material );
       circle.name = "figurine_"+fi;
       this.scene.add( circle );
@@ -407,13 +423,15 @@ class Gl {
     let rot = Math.PI * hour / 6.0;
     let obj = this.scene.getObjectByName("hand_"+hand);
     if(obj) {
-      // obj.rotation.set(0, 0, -rot);
+      obj.rotation.set(0, 0, -rot);
+	  /*
       const q1 = new THREE.Quaternion();
       q1.setFromAxisAngle( new THREE.Vector3( 1, 0, 0 ), halfPi );
       const q2 = new THREE.Quaternion();
       q2.setFromAxisAngle( new THREE.Vector3( 0, 1, 0 ), -rot );
       q1.multiply(q2);
       obj.rotation.setFromQuaternion(q1);
+	  */
     } else {
       console.log(" [ Hand rotation set error ] - cannot find obj hand_"+hand);
     }
@@ -421,7 +439,7 @@ class Gl {
     // figurine
     let fobj = this.scene.getObjectByName("figurine_"+hand);
     let figurineDistance = 0.72 - 0.1 * hand;
-    let figurineDistanceZ = 0.09 + 0.053 * hand;
+    let figurineDistanceZ = 0.16 + 0.056 * hand;
     if(fobj) {
       fobj.position.set(figurineDistance * Math.sin(rot), figurineDistance * Math.cos(rot), figurineDistanceZ);
     } else {
